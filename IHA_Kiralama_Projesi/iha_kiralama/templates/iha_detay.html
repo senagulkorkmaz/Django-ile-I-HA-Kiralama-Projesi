@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>IHA Detay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>IHA Detay</h1>
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text"><strong>Marka:</strong> {{ iha.marka }}</p>
+                <p class="card-text"><strong>Model:</strong> {{ iha.model }}</p>
+                <p class="card-text"><strong>Ağırlık:</strong> {{ iha.agirlik }}</p>
+                <p class="card-text"><strong>Kategori:</strong> {{ iha.kategori }}</p>
+            </div>
+        </div>
+
+        <a href="{% url 'anasayfa' %}" class="btn btn-secondary mt-3">Ana Sayfa</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

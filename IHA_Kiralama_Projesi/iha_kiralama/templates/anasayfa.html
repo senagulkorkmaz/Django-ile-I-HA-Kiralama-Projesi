@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AnaSayfa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            margin-top: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .btn-primary,
+        .btn-danger {
+            padding: 8px 16px;
+            margin-right: 5px;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+
+        .table th:last-child,
+        .table td:last-child {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <h3>iNSANSIZ HAVA ARAÇ KİRALAMA SAYFASI</h3>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <form class="d-flex ms-auto">
+                    <input class="form-control me-2" type="search" placeholder="Genel Arama" aria-label="Search"
+                        id="navSearchInput">
+                    <button class="btn btn-outline-success" type="button" onclick="searchInTable()">Ara</button>
+                </form>
+                <a href="{% url 'logout' %}" class="btn btn-danger ms-3">Çıkış Yap</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Yeni İnsansız Hava Aracı Ekle</h3>
+                <form method="post" action="{% url 'iha_ekle' %}">
+                    {% csrf_token %}
+                    {{ iha_form.as_p }}
+                    <button type="submit" class="btn btn-primary">Ekle</button>
+                </form>
+                <hr />
+                <h3>İnsansız Hava Aracı Listesi</h3>
+                <input type="text" id="ihaSearchInput" class="form-control mb-3" placeholder="İnsansız Hava Aracı Ara">
+                <table id="ihaTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Marka</th>
+                            <th scope="col">Model</th>
+                            <th scope="col">Ağırlık</th>
+                            <th scope="col">Kategori</th>
+                            <th scope="col">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for iha in iha_list %}
+                        <tr>
+                            <td>{{ iha.marka }}</td>
+                            <td>{{ iha.model }}</td>
+                            <td>{{ iha.agirlik }}</td>
+                            <td>{{ iha.kategori }}</td>
+                            <td>
+                                <div class="d-flex justify-content-between">
+                                    <form method="post" action="{% url 'iha_sil' iha.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Sil</button>
+                                    </form>
+                                    <a href="{% url 'iha_duzenle' iha.id %}" class="btn btn-warning">Düzenle</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h3>Kiralama Ekle</h3>
+                <form method="post" action="{% url 'kiralama_ekle' %}">
+                    {% csrf_token %}
+                    {{ kiralama_form.as_p }} <!-- Kiralama Formu -->
+                    <button type="submit" class="btn btn-primary">Ekle</button>
+                </form>
+                <hr />
+                <h3>Kiralanan İnsansız Hava Aracı Listesi</h3>
+                <input type="text" id="kiralamaSearchInput" class="form-control mb-3" placeholder="Kiralama Ara">
+                <table id="kiralamaTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">İnsansız Hava Aracı</th>
+                            <th scope="col">Tarih</th>
+                            <th scope="col">Saat Aralığı</th>
+                            <th scope="col">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kiralama in kiralama_list %}
+                        <tr>
+                            <td>{{ kiralama.iha }}</td>
+                            <td>{{ kiralama.tarih }}</td>
+                            <td>{{ kiralama.saat_araligi }}</td>
+                            <td>
+                                <div class="d-flex">
+                                    <form method="post" action="{% url 'kiralama_sil' kiralama.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger me-2">Sil</button>
+                                    </form>
+                                    <a href="{% url 'kiralama_guncelle' kiralama.id %}"
+                                        class="btn btn-warning">Düzenle</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function searchTable(inputId, tableId) {
+            const input = document.getElementById(inputId);
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                let displayStyle = 'none';
+                const row = rows[i].getElementsByTagName('td');
+                for (let j = 0; j < row.length; j++) {
+                    if (row[j].textContent.toLowerCase().indexOf(filter) > -1) {
+                        displayStyle = '';
+                        break;
+                    }
+                }
+                rows[i].style.display = displayStyle;
+            }
+        }
+
+        document.getElementById('ihaSearchInput').addEventListener('input', function () {
+            searchTable('ihaSearchInput', 'ihaTable');
+        });
+
+        document.getElementById('kiralamaSearchInput').addEventListener('input', function () {
+            searchTable('kiralamaSearchInput', 'kiralamaTable');
+        });
+        function searchInTable() {
+            const input = document.getElementById('navSearchInput');
+            const filter = input.value.toLowerCase();
+            const ihaTableRows = document.querySelectorAll('#ihaTable tbody tr');
+            const kiralamaTableRows = document.querySelectorAll('#kiralamaTable tbody tr');
+
+            ihaTableRows.forEach(row => {
+                let found = false;
+                row.querySelectorAll('td').forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(filter)) {
+                        found = true;
+                    }
+                });
+                row.style.display = found ? '' : 'none';
+            });
+
+            kiralamaTableRows.forEach(row => {
+                let found = false;
+                row.querySelectorAll('td').forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(filter)) {
+                        found = true;
+                    }
+                });
+                row.style.display = found ? '' : 'none';
+            });
+        }
+
+    </script>
+</body>
+
+</html>
